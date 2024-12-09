@@ -1,9 +1,63 @@
-// 监听来自 content-script 的消息
-chrome.runtime.onMessage.addListener((message) => {
-    if (message.data) {
-        console.log('Received data from content script:', message.data);
+let currentIndex = 0;
+let idArray = [];
+let isRunning = false;
+let timer = null;
 
-        // 将数据传递给 popup.js
-        chrome.action.openPopup();  // 打开弹窗
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+    if (message.action === 'start') {
+        // 验证并初始化 ID 数组
+        idArray = message.goodsIds;
+        if (idArray.length === 0) {
+            sendResponse({ status: 'error', message: 'No valid IDs found.' });
+            return;
+        }
+
+        if (!isRunning) {
+            isRunning = true;
+            currentIndex = 0;
+            // 开始执行任务
+            startProcessing();
+            sendResponse({ status: 'started', message: 'Started successfully.' });
+        } else {
+            sendResponse({ status: 'error', message: 'Already running.' });
+        }
+    } else if (message.action === 'stop') {
+        // 停止任务
+        stopProcessing();
+        sendResponse({ status: 'stopped', message: 'Timer stopped.' });
     }
 });
+
+// 启动处理任务
+function startProcessing() {
+    if (currentIndex < idArray.length) {
+        const targetUrl = `https://buff.163.com/goods/${idArray[currentIndex]}?from=market#tab=selling&page_num=1&min_paintwear=0.00&max_paintwear=0.01`;
+
+        // 更新当前标签页的 URL
+        chrome.tabs.query({}, (tabs) => {
+            if (tabs.length > 0) {
+                chrome.tabs.update(tabs[0].id, { url: targetUrl });
+            }
+        });
+
+        console.log(`Navigated to: ${targetUrl}`);
+        currentIndex++;
+
+        // 设置下一次执行的时间间隔
+        timer = setTimeout(startProcessing, 10*1000); // 每5秒执行一次
+    } else {
+        // 如果处理完所有ID，停止任务
+        stopProcessing();
+        console.log('All IDs processed, task stopped.');
+    }
+}
+
+// 停止处理任务
+function stopProcessing() {
+    if (timer) {
+        clearTimeout(timer);
+        timer = null;
+    }
+    isRunning = false;
+    currentIndex = 0; // 重置索引
+}

@@ -4,7 +4,15 @@
   "version": "1.0",
   "description": "Scrape the first row of data from a Buff page",
   "permissions": [
-    "activeTab"
+    "contextMenus",
+    "tabs",
+    "activeTab",
+    "notifications",
+    "scripting",
+    "storage",
+    "scripting",
+    "alarms",
+    "downloads"
   ],
   "background": {
     "service_worker": "background.js"
@@ -19,7 +27,11 @@
   "content_scripts": [
     {
       "matches": ["https://buff.163.com/goods/*"],
-      "js": ["content-script.js"]
+      "js": [
+        "./js/jquery-1.8.2.min.js",
+        "content-script.js"
+      ],
+      "run_at": "document_start"
     }
   ]
 }
