@@ -8,6 +8,9 @@ document.getElementById('startButton').addEventListener('click', () => {
     const goodsIds = document.getElementById('goodsIds').value.trim();
     console.log(goodsIds)
 
+    // 重置
+    chrome.storage.local.set({storedData: {}});
+
     // 验证输入并初始化 ID 数组
     if (!goodsIds) {
         alert('Please enter at least one ID.');
@@ -67,9 +70,7 @@ chrome.runtime.onMessage.addListener((message) => {
                 storedData[goodId] = price;
 
                 // 保存更新后的数据回 chrome.storage.local
-                chrome.storage.local.set(storedData, () => {
-                    console.log('Data updated in storage:', storedData);
-                });
+                chrome.storage.local.set({storedData: storedData});
             });
         }
 
@@ -88,7 +89,6 @@ function exportToExcel() {
         // 将存储的数据转换为一个数组，以便导出
         let exportData = [];
         for (let goodId in storedData) {
-            debugger
             exportData.push([goodId, storedData[goodId]]);
         }
 
