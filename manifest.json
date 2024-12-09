@@ -1,0 +1,25 @@
+{
+  "manifest_version": 3,
+  "name": "buff-plugin",
+  "version": "1.0",
+  "description": "Scrape the first row of data from a Buff page",
+  "permissions": [
+    "activeTab"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {}
+  },
+  "host_permissions": [
+    "https://buff.163.com/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": ["https://buff.163.com/goods/*"],
+      "js": ["content-script.js"]
+    }
+  ]
+}
