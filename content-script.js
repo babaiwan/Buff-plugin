@@ -1,5 +1,19 @@
 // 监听页面加载完成后，抓取 ID 为 market-selling-list 的表格数据
 $(document).ready(function () {
+    // 获取 captcha 元素
+    const captchaDiv = document.getElementById('captcha');
+
+    // 检查是否有 input 元素
+    if (captchaDiv && captchaDiv.querySelector('input')) {
+        chrome.runtime.sendMessage({ action: 'stop' }, (response) => {
+            if (response.status === 'stopped') {
+                console.log('Task stopped successfully.');
+            } else {
+                console.log('Error stopping task: ' + response.message);
+            }
+        });
+    }
+
     // 获取 ID 为 market-selling-list 的 table 元素
     setTimeout(_=>{
         const table = document.getElementById('market-selling-list');
