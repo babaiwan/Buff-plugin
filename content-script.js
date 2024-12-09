@@ -17,6 +17,23 @@ $(document).ready(function () {
             if (match) {
                 itemId = match[1];  // 获取第一个捕获的组，即商品 ID
                 chrome.runtime.sendMessage({ data: arr,goodId:itemId });
+
+                if (arr.length != 0){
+                    let price = arr[0].price;
+
+                    // 从 chrome.storage.local 获取已有数据
+                    chrome.storage.local.get('storedData', (result) => {
+                        let storedData = result.storedData || {};
+
+                        // 更新或添加新的 goodId 和 price
+                        storedData[itemId] = price;
+                        console.log('set storeData')
+                        console.log(storedData)
+
+                        // 保存更新后的数据回 chrome.storage.local
+                        chrome.storage.local.set({storedData: storedData});
+                    });
+                }
             }
 
         } else {

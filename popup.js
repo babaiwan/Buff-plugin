@@ -64,32 +64,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-
-// 监听来自 content-script.js 的消息
-    chrome.runtime.onMessage.addListener((message) => {
-        if (message.data) {
-            if (message.data.length != 0) {
-                let goodId = message.goodId;
-                let price = message.data[0].price;
-
-                // 从 chrome.storage.local 获取已有数据
-                chrome.storage.local.get('storedData', (result) => {
-                    let storedData = result.storedData || {};
-
-                    // 更新或添加新的 goodId 和 price
-                    storedData[goodId] = price;
-                    console.log('set storeData')
-                    console.log(storedData)
-
-                    // 保存更新后的数据回 chrome.storage.local
-                    chrome.storage.local.set({storedData: storedData});
-                });
-            }
-
-            console.log('Received and displayed table data.');
-        }
-    });
-
 // 导出到 Excel 功能
     function exportToExcel() {
         chrome.storage.local.get('storedData', (result) => {
