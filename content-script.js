@@ -1,58 +1,60 @@
 // 监听页面加载完成后，抓取 ID 为 market-selling-list 的表格数据
 $(document).ready(function () {
-    // 获取 captcha 元素
-    const captchaDiv = document.getElementById('captcha');
-
-    // 检查是否有 input 元素
-    if (captchaDiv && captchaDiv.querySelector('input')) {
-        chrome.runtime.sendMessage({ action: 'stop' }, (response) => {
-            if (response.status === 'stopped') {
-                console.log('Task stopped successfully.');
-            } else {
-                console.log('Error stopping task: ' + response.message);
-            }
-        });
-    }
 
     // 获取 ID 为 market-selling-list 的 table 元素
     setTimeout(_=>{
-        const table = document.getElementById('market-selling-list');
+        // 获取 captcha 元素
+        const captchaDiv = document.getElementById('captcha');
 
-        if (table) {
-
-            // 将抓取到的 table HTML 内容发送给 popup.js
-            let arr = getRowData()
-            console.log(arr)
-// 使用正则表达式提取商品 ID
-            const regex = /https:\/\/buff\.163\.com\/goods\/(\d+)\?/;
-            const match = window.location.href.match(regex);
-
-            let itemId = null;
-            if (match) {
-                itemId = match[1];  // 获取第一个捕获的组，即商品 ID
-                chrome.runtime.sendMessage({ data: arr,goodId:itemId });
-
-                if (arr.length != 0){
-                    let price = arr[0].price;
-
-                    // 从 chrome.storage.local 获取已有数据
-                    chrome.storage.local.get('storedData', (result) => {
-                        let storedData = result.storedData || {};
-
-                        // 更新或添加新的 goodId 和 price
-                        storedData[itemId] = price;
-                        console.log('set storeData')
-                        console.log(storedData)
-
-                        // 保存更新后的数据回 chrome.storage.local
-                        chrome.storage.local.set({storedData: storedData});
-                    });
+        // 检查是否有 input 元素
+        if (captchaDiv && captchaDiv.querySelector('input')) {
+            chrome.runtime.sendMessage({ action: 'stop' }, (response) => {
+                if (response.status === 'stopped') {
+                    console.log('Task stopped successfully.');
+                } else {
+                    console.log('Error stopping task: ' + response.message);
                 }
-            }
+            });
+        }else{
+            const table = document.getElementById('market-selling-list');
 
-        } else {
-            console.log('Table with ID "market-selling-list" not found.');
+            if (table) {
+
+                // 将抓取到的 table HTML 内容发送给 popup.js
+                let arr = getRowData()
+                console.log(arr)
+// 使用正则表达式提取商品 ID
+                const regex = /https:\/\/buff\.163\.com\/goods\/(\d+)\?/;
+                const match = window.location.href.match(regex);
+
+                let itemId = null;
+                if (match) {
+                    itemId = match[1];  // 获取第一个捕获的组，即商品 ID
+                    chrome.runtime.sendMessage({ data: arr,goodId:itemId });
+
+                    if (arr.length != 0){
+                        let price = arr[0].price;
+
+                        // 从 chrome.storage.local 获取已有数据
+                        chrome.storage.local.get('storedData', (result) => {
+                            let storedData = result.storedData || {};
+
+                            // 更新或添加新的 goodId 和 price
+                            storedData[itemId] = price;
+                            console.log('set storeData')
+                            console.log(storedData)
+
+                            // 保存更新后的数据回 chrome.storage.local
+                            chrome.storage.local.set({storedData: storedData});
+                        });
+                    }
+                }
+
+            } else {
+                console.log('Table with ID "market-selling-list" not found.');
+            }
         }
+
     },1000)
 })
 
